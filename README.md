@@ -1,4 +1,5 @@
-After creating or updating a `docker-compose.yml` file, there are a few steps you need to follow to ensure the changes are applied and the services run smoothly. Here's a practical guide:
+# POC testing postgres postgrest with bruno
+
 
 ### 1. **Check the Docker Compose File**
 Ensure your updated file is valid and free of syntax errors by running:
