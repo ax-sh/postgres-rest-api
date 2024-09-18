@@ -1,4 +1,4 @@
-# POC testing postgres postgrest with bruno
+# POC testing postgres postgrest with bruno with docker compose
 
 
 ### 1. **Check the Docker Compose File**
@@ -48,5 +48,3 @@ If you're aiming for zero downtime during updates, you can use strategies like *
 3. Remove unused containers with `docker-compose down --remove-orphans`.
 4. (Optional) Tail logs using `docker-compose logs -f`.
 5. Confirm the status of containers with `docker-compose ps`.
-
-This flow ensures a smooth and efficient update process.
