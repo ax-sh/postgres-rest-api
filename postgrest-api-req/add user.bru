@@ -1,0 +1,17 @@
+meta {
+  name: add user
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:3333/users
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "username": "man"
+  }
+}

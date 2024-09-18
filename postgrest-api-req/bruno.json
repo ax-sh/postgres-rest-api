@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "postgrest-api-req",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
