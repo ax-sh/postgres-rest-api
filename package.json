@@ -1,0 +1,31 @@
+{
+  "name": "postgres-17-db-rest-api",
+  "module": "src/index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "^1.2.4",
+    "dotenv-safe": "^9.1.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5.8.2"
+  },
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "down": "docker compose down --remove-orphans",
+    "up": "docker compose up -d",
+    "lint": "docker compose config inspect docker-compose.yml",
+    "config": "docker compose config | yq",
+    "pg": "docker compose exec db psql -U postgres",
+    "psql": "docker-compose exec -u postgres postgres psql",
+    "db:studio": "bun drizzle-kit studio",
+    "generate-client": "openapi-ts --base http://localhost:3000 --input http://localhost:3000/ --output ./src/client --client @hey-api/client-axios"
+  },
+  "dependencies": {
+    "@hey-api/client-axios": "^0.6.2",
+    "@hey-api/openapi-ts": "^0.64.10",
+    "axios": "^1.8.1",
+    "dotenv": "^16.4.7",
+    "drizzle-kit": "^0.30.5"
+  }
+}

@@ -1,0 +1,90 @@
+name: postgres-db-rest-api
+
+services:
+  postgres:
+    container_name: db
+    image: postgres:17-alpine
+    env_file:
+      - ./.env
+    #    environment:
+    #      - POSTGRES_DB=${DB_NAME}
+    #      - POSTGRES_USER=${DB_USER}
+    #      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5432:5432"
+    volumes:
+      - ${POSTGRES_DATA_PATH}:/var/lib/postgresql/data
+      - ${POSTGRES_INIT_SQL_PATH}:/docker-entrypoint-initdb.d/init.sql
+
+  whodb:
+    image: clidey/whodb
+    container_name: pgadmin-alternative
+    environment:
+      WHODB_POSTGRES_1: '{"host":"postgres","user":"${POSTGRES_USER}","password":"${POSTGRES_PASSWORD}","database":"${POSTGRES_DB}"}'
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+    entrypoint: /bin/sh -c "chmod 600 /pgpass; /entrypoint.sh;"
+    user: root
+    configs:
+      - source: servers.json
+        target: /pgadmin4/servers.json
+      - source: pgpass
+        target: /pgpass
+    depends_on:
+      - postgres
+  #    volumes:
+  #      - pgadmin:/var/lib/pgadmin
+  ##    networks:
+  ##      - postgres
+  postgrest:
+    image: postgrest/postgrest
+    restart: always
+    ports:
+      - ${POSTGREST_PORT:-3000}:3000
+    environment:
+      PGRST_DB_URI: ${PGRST_DB_URI}
+      PGRST_DB_SCHEMA: ${PGRST_DB_SCHEMA}
+      PGRST_DB_ANON_ROLE: ${PGRST_DB_ANON_ROLE}
+    depends_on:
+      - postgres
+#    networks:
+#      - app-network
+
+configs:
+  pgpass:
+    #    db is the container name
+    content: db:5432:*:${POSTGRES_USER}:${POSTGRES_PASSWORD}
+  #    content: db:5432:*:postgres:postgres
+  servers.json:
+    content: |
+      {"Servers": {"1": {
+        "Group": "Servers",
+        "Name": "docker ${POSTGRES_USER} Local Postgres 17",
+        "Host": "db",
+        "Port": 5432,
+        "MaintenanceDB": "postgres",
+        "Username": "postgres",
+        "PassFile": "/pgpass",
+        "SSLMode": "prefer"
+      }}}
+
+volumes:
+  postgres_data:
+  pgadmin:
